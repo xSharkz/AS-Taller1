@@ -14,11 +14,7 @@ app.get('/', (req, res) => {
   res.send('El servidor está corriendo.');
 });
 
-app.use('/users', usersRouters);
-
-
-
-
+app.use('/usuarios', usersRouters);
 
 app.listen(port, () => {
   console.log(`*Servidor corriendo en modo ${environment} en el url: http://localhost:${port}/.`);
