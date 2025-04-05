@@ -3,14 +3,13 @@ const { getAllUsers, getUserById, deleteUserById, updateUserById, createUser } =
 
 const usersRouter = Router();
 
-usersRouter.post('/', createUser);
+usersRouter.route('/')
+    .get(getAllUsers)
+    .post(createUser);
 
-usersRouter.get('/:id', getUserById);
-
-usersRouter.patch('/:id', updateUserById);
-
-usersRouter.delete('/:id', deleteUserById);
-
-usersRouter.get('/', getAllUsers);
+usersRouter.route('/:id')
+    .get(getUserById)
+    .patch(updateUserById)
+    .delete(deleteUserById);
 
 module.exports = usersRouter;
