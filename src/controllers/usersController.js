@@ -1,12 +1,11 @@
 const bcrypt = require('bcrypt');
 
 const users = [
-    { id: 0, name: 'Martin', lastName: 'Becerra', email: 'martin.becerra@alumnos.ucn.cl', password: 'admin', role: 'Administrador', createdDate: '05/04/2025', active: 1},
+    { id: 0, name: 'Martin', lastName: 'Becerra', email: 'martin.becerra@alumnos.ucn.cl', password: '$2b$10$DFZAgzxxZUuo7XexduNQOe6S/YoWB2fSLSDCdjkgnU8ZXc5lgaJ4a', role: 'Administrador', createdDate: '05/04/2025', active: 1},
 ];
 
 const createUser = (req, res) => {
     const { name, lastName, email, password, confirmationPassword, role } = req.body;
-    
     if (!name?.trim() || !lastName?.trim() || !email?.trim() || !password?.trim() || !confirmationPassword?.trim() || !role?.trim()) {
         return res.status(400).json({ message: 'Todos los campos son obligatorios' });
     }
@@ -34,7 +33,7 @@ const createUser = (req, res) => {
         createdDate: new Date().toLocaleDateString(),
         active: 1
     };
-
+    
     users.push(newUser);
     const { password: hashedPassword, ...userWithoutPassword } = newUser;
     res.status(201).json({ message: 'Usuario creado', user: userWithoutPassword });
