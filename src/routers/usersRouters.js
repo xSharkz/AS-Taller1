@@ -1,14 +1,16 @@
 const { Router } = require('express');
-const { getAllUsers, getUserById, deleteUserById, updateUserById } = require('../controllers/usersController');
+const { getAllUsers, getUserById, deleteUserById, updateUserById, createUser } = require('../controllers/usersController');
 
 const usersRouter = Router();
 
-usersRouter.get('/', getAllUsers);
+usersRouter.post('/', createUser);
 
 usersRouter.get('/:id', getUserById);
 
+usersRouter.patch('/:id', updateUserById);
+
 usersRouter.delete('/:id', deleteUserById);
 
-usersRouter.patch('/:id', updateUserById);
+usersRouter.get('/', getAllUsers);
 
 module.exports = usersRouter;
