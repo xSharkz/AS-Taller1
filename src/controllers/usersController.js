@@ -1,5 +1,5 @@
 const users = [
-    { id: 0, name: 'Martin', lastName: 'Becerra', email: 'martin.becerra@alumnos.ucn.cl', password: 'admin', role: 'Administrador', createdDate: '05/04/2025'},
+    { id: 0, name: 'Martin', lastName: 'Becerra', email: 'martin.becerra@alumnos.ucn.cl', password: 'admin', role: 'Administrador', createdDate: '05/04/2025', active: 1},
 ];
 
 const getUserById = (req, res) => {
@@ -12,6 +12,18 @@ const getUserById = (req, res) => {
 
     const { id: userId, name, lastName, email, role, createdDate } = user;
     res.status(200).json({ id: userId, name, lastName, email, role, createdDate });
+}
+
+const deleteUserById = (req, res) => {
+    const { id } = req.params;
+    const user = users.find(user => user.id === parseInt(id));
+
+    if (!user) {
+        return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    user.active = 0;
+    res.status(200).end();
 }
 
 const getAllUsers = (req, res) => {
@@ -29,5 +41,6 @@ const getAllUsers = (req, res) => {
 
 module.exports = {
     getAllUsers,
-    getUserById
+    getUserById,
+    deleteUserById,
 };
