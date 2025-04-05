@@ -1,6 +1,8 @@
+require('dotenv').config();
 const express = require('express');
 const morgan = require('morgan');
 const usersRouters = require('./src/routers/usersRouters');
+const authRouters = require('./src/routers/authRouters');
 
 const port = process.env.PORT || 3000;
 const environment = process.env.NODE_ENV || 'development';
@@ -15,6 +17,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/usuarios', usersRouters);
+app.use('/auth', authRouters);
 
 app.listen(port, () => {
   console.log(`*Servidor corriendo en modo ${environment} en el url: http://localhost:${port}/.`);
