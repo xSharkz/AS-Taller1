@@ -88,8 +88,32 @@ const deleteUserById = (req, res) => {
     res.status(200).end();
 }
 
-const getAllUsers = (req, res) => {
-    const filteredUsers = users.map(({ id, name, lastName, email, role, createdDate }) => ({
+const getAllUsers = async (req, res) => {
+    const { email, name, lastName } = req.query;
+
+    let filteredUsers = users;
+
+    if (email?.trim()) {
+        filteredUsers = filteredUsers.filter(user => 
+            user.email.toLowerCase().includes(email.toLowerCase())
+        );
+    }
+
+    if (name?.trim()) {
+        filteredUsers = filteredUsers.filter(user => 
+            `${user.name} ${user.lastName}`.toLowerCase().includes(name.toLowerCase())
+        );
+    }
+
+    if (lastName?.trim()) {
+        filteredUsers = filteredUsers.filter(user => 
+            `${user.lastName} ${user.lastName}`.toLowerCase().includes(lastName.toLowerCase())
+        );
+    }
+
+    filteredUsers = filteredUsers.filter(user => user.active === 1);
+
+    const result = filteredUsers.map(({ id, name, lastName, email, role, createdDate }) => ({
         id,
         name,
         lastName,
@@ -98,8 +122,21 @@ const getAllUsers = (req, res) => {
         createdDate
     }));
 
-    res.status(200).json(filteredUsers);
+    res.status(200).json(result);
 }
+
+const getAllUsersData = () => {
+    return users.map(({ id, name, lastName, email, role, createdDate, password, active }) => ({
+        id,
+        name,
+        lastName,
+        email,
+        role,
+        createdDate,
+        password,
+        active
+    }));
+};
 
 module.exports = {
     getAllUsers,
@@ -107,4 +144,5 @@ module.exports = {
     deleteUserById,
     updateUserById,
     createUser,
+    getAllUsersData,
 };
