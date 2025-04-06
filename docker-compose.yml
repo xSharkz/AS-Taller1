@@ -1,0 +1,20 @@
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb-astaller1
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: root
+    ports:
+      - "27017:27017"
+      
+  postgresql:
+    image: postgres:latest 
+    container_name: postgresql-astaller1
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: root
+    ports:
+      - "5432:5432"
