@@ -1,16 +1,13 @@
 const bcrypt = require('bcrypt');
+const Users = require('../database/models/usersModel');
 
-const users = [
-    { id: 0, name: 'Martin', lastName: 'Becerra', email: 'martin.becerra@alumnos.ucn.cl', password: '$2b$10$DFZAgzxxZUuo7XexduNQOe6S/YoWB2fSLSDCdjkgnU8ZXc5lgaJ4a', role: 'Administrador', createdDate: '05/04/2025', active: 1},
-];
-
-const createUser = (req, res) => {
+const createUser = async (req, res) => {
     const { name, lastName, email, password, confirmationPassword, role } = req.body;
     if (!name?.trim() || !lastName?.trim() || !email?.trim() || !password?.trim() || !confirmationPassword?.trim() || !role?.trim()) {
         return res.status(400).json({ message: 'Todos los campos son obligatorios' });
     }
 
-    const existingUser = users.find(user => user.email === email);
+    const existingUser = await Users.findOne({email});
     if (existingUser) {
         return res.status(400).json({ message: 'El correo ya está registrado' });
     }
@@ -22,120 +19,117 @@ const createUser = (req, res) => {
     if ( confirmationPassword !== password ) {
         return res.status(400).json({ message: 'Las contraseñas no coinciden' });
     }
-
-    const newUser = {
-        id: users.length,
+    const newUser = await Users.create({
         name,
         lastName,
         email,
         password: bcrypt.hashSync(password, 10),
         role,
-        createdDate: new Date().toLocaleDateString(),
-        active: 1
-    };
+        createdAt: new Date().toLocaleDateString(),
+        active: true
+    });
     
-    users.push(newUser);
     const { password: hashedPassword, ...userWithoutPassword } = newUser;
     res.status(201).json({ message: 'Usuario creado', user: userWithoutPassword });
 }
 
-const getUserById = (req, res) => {
+const getUserById = async (req, res) => {
     const { id } = req.params;
-    const user = users.find(user => user.id === parseInt(id));
+    const user = await Users.findById(id);
 
     if (!user) {
         return res.status(404).json({ message: 'Usuario no encontrado' });
     }
 
-    const { id: userId, name, lastName, email, role, createdDate } = user;
-    res.status(200).json({ id: userId, name, lastName, email, role, createdDate });
+    const { _id, name, lastName, email, role, createdAt } = user;
+    res.status(200).json({ id: _id, name, lastName, email, role, createdAt });
 }
 
-const updateUserById = (req, res) => {
-    const { id } = req.params;
+const updateUserById = async (req, res) => {
+    try {
+        const { id } = req.params;
     
-    const user = users.find(user => user.id === parseInt(id));
+        const user = await Users.findById(id);
 
-    if (!user) {
-        return res.status(404).json({ message: 'Usuario no encontrado' });
+        if (!user) {
+            return res.status(404).json({ message: 'Usuario no encontrado' });
+        }
+
+        const { password } = req.body;
+
+        if (password) {
+            return res.status(400).json({ message: 'No se puede modificar la contraseña aquí' });
+        }
+
+        const { name, lastName, email } = req.body;
+        user.name = name || user.name;
+        user.lastName = lastName || user.lastName;
+        user.email = email || user.email;
+
+        await user.save();
+        const { _id, role, createdAt } = user;
+        res.status(200).json({ id: _id, name: user.name, lastName: user.lastName, email: user.email, role, createdAt });
+        }
+    catch (error) {
+        res.status(500).json({ message: 'Error al actualizar el usuario', error: error.message });
     }
-
-    const { password } = req.body;
-
-    if (password) {
-        return res.status(400).json({ message: 'No se puede modificar la contraseña aquí' });
-    }
-
-    const { name, lastName, email } = req.body;
-    user.name = name || user.name;
-    user.lastName = lastName || user.lastName;
-    user.email = email || user.email;
-
-    const { id: userId, name: userName, lastName: userLastName, email: userEmail, role, createdDate } = user;
-    res.status(200).json({ id: userId, name: userName, lastName: userLastName, email: userEmail, role, createdDate });
+    
 }
 
-const deleteUserById = (req, res) => {
-    const { id } = req.params;
-    const user = users.find(user => user.id === parseInt(id));
+const deleteUserById = async (req, res) => {
+    try{
+        const { id } = req.params;
+        const user = await Users.findById(id);
 
-    if (!user) {
-        return res.status(404).json({ message: 'Usuario no encontrado' });
+        if (!user) {
+            return res.status(404).json({ message: 'Usuario no encontrado' });
+        }
+
+        user.active = false;
+        await user.save();
+
+        res.status(200).end();
+    } catch (error) {
+        res.status(500).json({ message: 'Error al eliminar el usuario', error: error.message });
     }
-
-    user.active = 0;
-    res.status(200).end();
 }
 
 const getAllUsers = async (req, res) => {
-    const { email, name, lastName } = req.query;
-
-    let filteredUsers = users;
-
-    if (email?.trim()) {
-        filteredUsers = filteredUsers.filter(user => 
-            user.email.toLowerCase().includes(email.toLowerCase())
-        );
-    }
-
-    if (name?.trim()) {
-        filteredUsers = filteredUsers.filter(user => 
-            `${user.name} ${user.lastName}`.toLowerCase().includes(name.toLowerCase())
-        );
-    }
-
-    if (lastName?.trim()) {
-        filteredUsers = filteredUsers.filter(user => 
-            `${user.lastName} ${user.lastName}`.toLowerCase().includes(lastName.toLowerCase())
-        );
-    }
-
-    filteredUsers = filteredUsers.filter(user => user.active === 1);
-
-    const result = filteredUsers.map(({ id, name, lastName, email, role, createdDate }) => ({
+    try {
+      const { email, name, lastName } = req.query;
+  
+      const query = { active: true };
+  
+      if (email?.trim()) {
+        query.email = { $regex: email, $options: 'i' }; 
+      }
+  
+      if (name?.trim()) {
+        query.name = { $regex: name, $options: 'i' };
+      }
+  
+      if (lastName?.trim()) {
+        query.lastName = { $regex: lastName, $options: 'i' };
+      }
+  
+      const users = await Users.find(query);
+  
+      const result = users.map(({ id, name, lastName, email, role, createdAt }) => ({
         id,
         name,
         lastName,
         email,
         role,
-        createdDate
-    }));
-
-    res.status(200).json(result);
-}
-
-const getAllUsersData = () => {
-    return users.map(({ id, name, lastName, email, role, createdDate, password, active }) => ({
-        id,
-        name,
-        lastName,
-        email,
-        role,
-        createdDate,
-        password,
-        active
-    }));
-};
+        createdAt
+      }));
+  
+      res.status(200).json(result);
+  
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Error al obtener los usuarios' });
+    }
+  };
 
 module.exports = {
     getAllUsers,
@@ -143,5 +137,4 @@ module.exports = {
     deleteUserById,
     updateUserById,
     createUser,
-    getAllUsersData,
 };
