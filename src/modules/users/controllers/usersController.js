@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt');
-const Users = require('../database/models/usersModel');
-const catchAsync = require('../utils/catchAsync');
-const { default: AppError } = require('../utils/appError');
+const Users = require('../../database/models/usersModel');
+const catchAsync = require('../../utils/catchAsync');
+const { default: AppError } = require('../../utils/appError');
 
 const createUser = catchAsync(async (req, res) => {
     const { name, lastName, email, password, confirmationPassword, role } = req.body;
