@@ -7,7 +7,7 @@ const jwt_secret = process.env.JWT_SECRET;
 
 const Users = require('../../../database/models/usersModel');
 const catchAsync = require('../../../utils/catchAsync');
-const { default: AppError } = require('../../../utils/appError');
+const AppError = require('../../../utils/appError');
 const prisma = require('../../../database/prisma');
 
 const login = catchAsync(async (req, res) => {
