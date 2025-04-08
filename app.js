@@ -6,6 +6,8 @@ const { connect } = require('mongoose');
 const usersRouters = require('./src/routers/usersRouters');
 const authRouters = require('./src/routers/authRouters');
 const globalErrorMiddleware = require('./src/middlewares/globalErrorMiddleware');
+const videoRouters = require('./src/routers/videoRouters');
+
 
 //const port = process.env.PORT || 3000;
 //const environment = process.env.NODE_ENV || 'development';
@@ -33,7 +35,7 @@ app.get('/', (req, res) => {
 
 app.use('/usuarios', usersRouters);
 app.use('/auth', authRouters);
-
+app.use('/videos', videoRouters);
 app.use(globalErrorMiddleware);
 
 /** 
