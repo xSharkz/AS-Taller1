@@ -7,8 +7,10 @@ const usersRouters = require('./src/routers/usersRouters');
 const authRouters = require('./src/routers/authRouters');
 const globalErrorMiddleware = require('./src/middlewares/globalErrorMiddleware');
 
-const port = process.env.PORT || 3000;
-const environment = process.env.NODE_ENV || 'development';
+//const port = process.env.PORT || 3000;
+//const environment = process.env.NODE_ENV || 'development';
+
+config({ path: '.env' });
 
 const MONGODB = process.env.MONGO_DATABASE
   .replace('<PASSWORD>', process.env.MONGO_PASSWORD)
@@ -34,6 +36,14 @@ app.use('/auth', authRouters);
 
 app.use(globalErrorMiddleware);
 
+/** 
 app.listen(port, () => {
   console.log(`*Servidor corriendo en modo ${environment} en el url: http://localhost:${port}/.`);
+});**/
+
+
+app.listen(process.env.PORT, () => {
+  console.log(`-Entorno: ${process.env.NODE_ENV}`);
+  console.log(`-Servidor corriendo en el puerto: ${process.env.PORT}`);
+  console.log(`-URL: http://localhost:${process.env.PORT}/`);
 });
