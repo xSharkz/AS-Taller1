@@ -21,7 +21,12 @@ cd AS-Taller1
 npm install
 ```
 
-4. **Ejecutar la aplicación**
+4. **Colocar datos semilla**
+```bash
+npm run seed
+```
+
+5. **Ejecutar la aplicación**
 ```bash
 npm start
 ```
