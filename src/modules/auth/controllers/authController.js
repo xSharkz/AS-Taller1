@@ -75,12 +75,13 @@ const login = catchAsync(async (req, res) => {
 const updatePasswordById = catchAsync(async (req, res) => {
     const { id } = req.params;
     const { password, newPassword, confirmPassword } = req.body;
-
+    
     if (!password?.trim() || !newPassword?.trim() || !confirmPassword?.trim()) {
         throw new AppError('Todos los campos son obligatorios', 400);
     }
 
     const user = await Users.findById(id);
+
     const ipAddress = req.ip;
     const userAgent = req.headers['user-agent'];
 
@@ -124,7 +125,9 @@ const updatePasswordById = catchAsync(async (req, res) => {
         });
         throw new AppError('Las contraseñas no coinciden', 400);
     }
-
+    console.log(user);
+    console.log(user.lastName);
+    
     user.password = await bcrypt.hash(newPassword, 10);
     await user.save();
 
