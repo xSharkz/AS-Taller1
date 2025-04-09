@@ -1,5 +1,6 @@
-const Video = require('../database/models/videoModel');
-const AppError = require('../utils/appError');
+const Video = require('../../../database/models/videoModel');
+const AppError = require('../../../utils/appError');
+
 
 // Crear nuevo video
 exports.crearVideo = async (req, res, next) => {

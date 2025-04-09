@@ -1,8 +1,9 @@
 const AppError = require('../utils/appError');
 
 const sendErrorDev = (err, req, res) => {
-  res.status(err.statusCode || 500).json({
-    status: err.status || 'error',
+  const statusCode = err.statusCode || 500;
+  res.status(statusCode || 500).json({
+    status: err.status || 'error' || 'error',
     error: err,
     message: err.message,
     stack: err.stack,
@@ -10,9 +11,10 @@ const sendErrorDev = (err, req, res) => {
 };
 
 const sendErrorProd = (err, req, res) => {
+  const statusCode = err.statusCode || 500;
   if (err.isOperational) {
-    res.status(err.statusCode).json({
-      status: err.status,
+    res.status(statusCode).json({
+      status: err.status || 'error',
       message: err.message,
     });
   } else {
@@ -24,17 +26,23 @@ const sendErrorProd = (err, req, res) => {
 };
 
 const globalErrorMiddleware = (err, req, res, next) => {
-  err.statusCode = err.statusCode || 500;
-  err.status = err.status || 'error';
+  let error = err;
 
-  if (process.env.NODE_ENV === 'development') {
-    return sendErrorDev(err, req, res);
+  // Asegurarse de que el error tiene un statusCode y status por defecto
+  if (err instanceof AppError) {
+    error.statusCode = err.statusCode || 500;
+    error.status = err.status || 'error';
+  } else {
+    // Si no es un AppError, asignamos un mensaje por defecto
+    error = { ...err, message: err.message || 'Error interno del servidor' };
   }
 
-  // Opcional: clonar error y controlar mensajes
-  let error = { ...err };
-  error.message = err.message || 'Error interno del servidor';
+  // Si estamos en desarrollo, mostramos más detalles del error
+  if (process.env.NODE_ENV === 'development') {
+    return sendErrorDev(error, req, res);
+  }
 
+  // En producción, mostramos un mensaje genérico
   sendErrorProd(error, req, res);
 };
 

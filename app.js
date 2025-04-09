@@ -3,10 +3,10 @@ config({ path: '.env' });
 const express = require('express');
 const morgan = require('morgan');
 const { connect } = require('mongoose');
-const usersRouters = require('./src/routers/usersRouters');
-const authRouters = require('./src/routers/authRouters');
+const usersRouters = require('./src/modules/users/routers/usersRouters');
+const authRouters = require('./src/modules/auth/routers/authRouters');
 const globalErrorMiddleware = require('./src/middlewares/globalErrorMiddleware');
-const videoRouters = require('./src/routers/videoRouters');
+const videoRouters = require('./src/modules/video/routers/videoRouters');
 
 
 //const port = process.env.PORT || 3000;
