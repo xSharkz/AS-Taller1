@@ -24,4 +24,24 @@ const generateFakeUser = async () => {
   };
 };
 
-module.exports = generateFakeUser;
+const generateFakeAdmin = async (username,userlastname,useremail) => {
+  const password = "admin";
+  const hashedPassword = await hashPassword(password);
+
+  return {
+    _id: randomUUID(),
+    name: username,
+    lastName: userlastname,
+    email: useremail,
+    password: hashedPassword,
+    role: "Administrador",
+    createdAt: faker.date.past(),
+    active: true,
+  };
+};
+
+module.exports = {
+  generateFakeUser,
+  generateFakeAdmin
+};
+
