@@ -2,24 +2,38 @@ const bcrypt = require('bcrypt');
 const Users = require('../../../database/models/usersModel');
 const catchAsync = require('../../../utils/catchAsync');
 const AppError = require('../../../utils/appError');
+const verifyToken = require('../../../utils/verifyToken');
 
 const createUser = catchAsync(async (req, res) => {
     const { name, lastName, email, password, confirmationPassword, role } = req.body;
     if (!name?.trim() || !lastName?.trim() || !email?.trim() || !password?.trim() || !confirmationPassword?.trim() || !role?.trim()) {
         throw new AppError('Todos los campos son obligatorios', 400);
     }
-
+    
     const existingUser = await Users.findOne({email});
     if (existingUser) {
         throw new AppError('El correo ya está registrado', 400);
     }
 
-    if (role !== 'Administrador' && role !== 'Usuario') {
-        throw new AppError('El rol debe ser Administrador o Usuario', 400);
+    if (role !== 'Administrador' && role !== 'Cliente') {
+        throw new AppError('El rol debe ser Administrador o Cliente', 400);
     }
 
     if ( confirmationPassword !== password ) {
         throw new AppError('Las contraseñas no coinciden', 400);
+    }
+
+    if (role === 'Administrador') {
+        const token = req.headers.authorization?.split(' ')[1];
+        if (!token) {
+            throw new AppError('No estás autenticado para crear un administrador', 401);
+        }
+        const decodedToken = await verifyToken(token);
+        const authenticatedUserRole = decodedToken.role;
+
+        if (authenticatedUserRole !== 'Administrador') {
+            throw new AppError('No tienes permisos para crear un usuario con rol Administrador', 403);
+        }
     }
     const newUser = await Users.create({
         name,
@@ -27,7 +41,7 @@ const createUser = catchAsync(async (req, res) => {
         email,
         password: bcrypt.hashSync(password, 10),
         role,
-        createdAt: new Date().toLocaleDateString(),
+        createdAt: new Date(),
         active: true
     });
     
@@ -37,10 +51,16 @@ const createUser = catchAsync(async (req, res) => {
 
 const getUserById = catchAsync(async (req, res) => {
     const { id } = req.params;
+    const { id: tokenId, role: tokenRole } = req.user;
+
     const user = await Users.findById(id);
 
     if (!user) {
         throw new AppError('Usuario no encontrado', 404);
+    }
+
+    if (tokenRole !== 'Administrador' && tokenId !== id) {
+        throw new AppError('No tienes permisos para ver este usuario', 403);
     }
 
     const { _id, name, lastName, email, role, createdAt } = user;
@@ -48,7 +68,6 @@ const getUserById = catchAsync(async (req, res) => {
 });
 
 const updateUserById = catchAsync(async (req, res) => {
-
     const { id } = req.params;
 
     const user = await Users.findById(id);
@@ -75,21 +94,35 @@ const updateUserById = catchAsync(async (req, res) => {
 
 const deleteUserById = catchAsync(async (req, res) => {
     const { id } = req.params;
+    const { id: tokenId, role: tokenRole } = req.user;
+
     const user = await Users.findById(id);
+
+    if (tokenRole !== 'Administrador') {
+        throw new AppError('No tienes permisos para realizar esta acción', 403);
+    }
 
     if (!user) {
         throw new AppError('Usuario no encontrado', 404);
     }
 
+    if (user._id.toString() === tokenId) {
+        throw new AppError('No puedes eliminar tu propio usuario', 400);
+    }
+
     user.active = false;
     await user.save();
 
-    res.status(200).end();
+    res.status(204).end();
 });
 
 const getAllUsers = catchAsync(async (req, res) => {
-
     const { email, name, lastName } = req.query;
+    const { id: tokenId, role: tokenRole } = req.user;
+
+    if (tokenRole !== 'Administrador') {
+        throw new AppError('No tienes permisos para realizar esta acción', 403);
+    }
 
     const query = { active: true };
 
