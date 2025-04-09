@@ -79,24 +79,14 @@ const updatePasswordById = catchAsync(async (req, res) => {
     if (!password?.trim() || !newPassword?.trim() || !confirmPassword?.trim()) {
         throw new AppError('Todos los campos son obligatorios', 400);
     }
-
     const user = await Users.findById(id);
+
+    if (!user) {
+        throw new AppError('Usuario no encontrado', 404);
+    }
 
     const ipAddress = req.ip;
     const userAgent = req.headers['user-agent'];
-
-    if (!user) {
-        await prisma.authLog.create({
-            data: {
-                email: user.email,
-                ipAddress,
-                userAgent,
-                action: 'UPDATE_PASSWORD',
-                success: false,
-            }
-        });
-        throw new AppError('Usuario no encontrado', 404);
-    }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
 

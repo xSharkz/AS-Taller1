@@ -24,8 +24,8 @@ async function mainSeedingFunction() {
             await prisma.authLog.deleteMany(); 
         }
 
-        await insertFakeUsers(10);
-        await insertFakeAuthLogs(10);
+        await insertFakeUsers(100);
+        await insertFakeAuthLogs(100);
 
         await disconnect();
    
