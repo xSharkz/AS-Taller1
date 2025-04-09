@@ -18,7 +18,7 @@ const generateFakeUser = async () => {
     lastName: faker.name.lastName(),
     email: faker.internet.email(),
     password: hashedPassword,
-    role: faker.helpers.arrayElement(['Administrador', 'Usuario']),
+    role: faker.helpers.arrayElement(['Administrador', 'Cliente']),
     createdAt: faker.date.past(),
     active: faker.datatype.boolean(),
   };
