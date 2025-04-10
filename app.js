@@ -38,11 +38,6 @@ app.use('/auth', authRouters);
 app.use('/videos', videoRouters);
 app.use(globalErrorMiddleware);
 
-/** 
-app.listen(port, () => {
-  console.log(`*Servidor corriendo en modo ${environment} en el url: http://localhost:${port}/.`);
-});**/
-
 
 app.listen(process.env.PORT, () => {
   console.log(`-Entorno: ${process.env.NODE_ENV}`);

@@ -1,21 +1,23 @@
 const { Router } = require('express');
 const {
-  crearVideo,
-  listarVideos,
-  obtenerVideo,
-  actualizarVideo,
-  eliminarVideo
+  createVideo,
+  getAllVideos,
+  getVideoById,
+  updateVideoById,
+  deleteVideoById
 } = require('../controllers/videoController');
+
+const authMiddleware = require('../../../middlewares/authMiddleware');
 
 const videoRouter = Router();
 
 videoRouter.route('/')
-  .get(listarVideos)
-  .post(crearVideo);
+  .get(authMiddleware, getAllVideos)
+  .post(authMiddleware, createVideo);
 
 videoRouter.route('/:id')
-  .get(obtenerVideo)
-  .patch(actualizarVideo)
-  .delete(eliminarVideo);
+  .get(authMiddleware, getVideoById)
+  .patch(authMiddleware, updateVideoById)
+  .delete(authMiddleware, deleteVideoById);
 
 module.exports = videoRouter;
