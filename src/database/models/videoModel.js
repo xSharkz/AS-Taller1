@@ -17,6 +17,10 @@ const videoSchema = new mongoose.Schema({
   eliminado: {
     type: Boolean,
     default: false
+  },
+  id: {
+    type: Number,
+    unique: true
   }
 }, {
   timestamps: true,
@@ -30,7 +34,6 @@ const videoSchema = new mongoose.Schema({
   }
 });
 
-// Añade el contador de ID auto-incremental
 videoSchema.plugin(AutoIncrement, { inc_field: 'id' });
 
 module.exports = mongoose.model('Video', videoSchema);
