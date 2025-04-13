@@ -7,10 +7,19 @@ const usersRouters = require('./src/modules/users/routers/usersRouters');
 const authRouters = require('./src/modules/auth/routers/authRouters');
 const globalErrorMiddleware = require('./src/middlewares/globalErrorMiddleware');
 const videoRouters = require('./src/modules/video/routers/videoRouters');
+const invoiceRouter = require('./src/modules/invoice/routers/invoiceRouter');
 
+const sequelize = require('./src/database/sequelize');
+const Invoice = require('./src/database/models/invoiceModel');
 
-//const port = process.env.PORT || 3000;
-//const environment = process.env.NODE_ENV || 'development';
+(async () => {
+  try {
+    await sequelize.authenticate();
+    await sequelize.sync({ alter: true });
+  } catch (error) {
+    console.error('Error al conectar a MariaDB:', error.message);
+  }
+})();
 
 config({ path: '.env' });
 
@@ -36,8 +45,8 @@ app.get('/', (req, res) => {
 app.use('/usuarios', usersRouters);
 app.use('/auth', authRouters);
 app.use('/videos', videoRouters);
+app.use('/facturas', invoiceRouter);
 app.use(globalErrorMiddleware);
-
 
 app.listen(process.env.PORT, () => {
   console.log(`-Entorno: ${process.env.NODE_ENV}`);
