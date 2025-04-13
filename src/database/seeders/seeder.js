@@ -3,6 +3,8 @@ const dotenv = require('dotenv');
 const insertFakeUsers = require('./usersSeeder');
 const insertFakeAuthLogs = require('./authSeeder');
 const insertFakeVideos = require('./videoSeeder');
+const insertFakeInvoices = require('./invoiceSeeder');
+const sequelize = require('../sequelize');
 const prisma = require('../prisma');
 
 const { connect, connection, disconnect } = mongoose;
@@ -27,9 +29,9 @@ async function mainSeedingFunction() {
 
         await insertFakeUsers(100);
         await insertFakeAuthLogs(100);
-        console.log('📹 Insertando videos falsos...');
         await insertFakeVideos(500);
-
+        await sequelize.sync({ alter: true });
+        await insertFakeInvoices(350);
         await disconnect();
    
     } catch (error) {

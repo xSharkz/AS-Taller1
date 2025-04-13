@@ -9,7 +9,6 @@ const insertFakeVideos = async (num = 500) => {
     }
 
     const total = await Video.countDocuments();
-    console.log(`Total de videos insertados: ${total}`);
   } catch (error) {
     console.error('Error al insertar videos:', error.message);
     throw error;
