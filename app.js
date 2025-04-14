@@ -16,6 +16,7 @@ const Invoice = require('./src/database/models/invoiceModel');
   try {
     await sequelize.authenticate();
     await sequelize.sync({ alter: true });
+    console.log('Conexión a MariaDB exitosa y tablas sincronizadas.');
   } catch (error) {
     console.error('Error al conectar a MariaDB:', error.message);
   }

@@ -9,7 +9,11 @@ const sequelize = new Sequelize(
     host: process.env.MARIADB_HOST,
     dialect: 'mariadb',
     port: process.env.MARIADB_PORT || 3306,
-    logging: false
+    logging: false,
+    dialectOptions: {
+      connectTimeout: 20000,          
+      ssl: false                      
+    }
   }
 );
 
