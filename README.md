@@ -21,12 +21,22 @@ cd AS-Taller1
 npm install
 ```
 
-4. **Colocar datos semilla**
+4. **Crear un archivo `.env` en la raiz del proyecto y ingresar las variables de entorno**
+```bash
+cp .env.example .env
+```
+
+5. **Generar cliente de prisma**
+```bash
+npx prisma generate
+```
+
+6. **Colocar datos semilla**
 ```bash
 npm run seed
 ```
 
-5. **Ejecutar la aplicación**
+7. **Ejecutar la aplicación**
 ```bash
 npm start
 ```
