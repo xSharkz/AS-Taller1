@@ -18,3 +18,15 @@ services:
       POSTGRES_PASSWORD: root
     ports:
       - "5432:5432"
+  
+  mariadb:
+    image: mariadb:latest
+    container_name: mariadb-astaller1
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: streamflow_facturacion
+      MARIADB_USER: admin
+      MARIADB_PASSWORD: root
+    ports:
+      - "3306:3306"
